@@ -13,7 +13,4 @@ export const toggleTodo = (id) => ({
   id,
 });
 
-export const setVisibilityFilter = (filter) => ({
-  type: 'SET_VISIBILITY_FILTER',
-  filter,
-});
+// no long need setVisibilityFilter action creator, because reactRouter.Link (in FilterLink) will handle it
