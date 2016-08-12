@@ -1,23 +1,18 @@
 let nextTodo = 0;
 
-export const addTodo = (text) => {
-  return {
-    type: 'ADD_TODO',
-    id: (nextTodo++).toString(),
-    text,
-  };
-};
+// remove duplicate blocks & replace with ()wrawpped object expression b/c it only returns a returnn statement
+export const addTodo = (text) => ({
+  type: 'ADD_TODO',
+  id: (nextTodo++).toString(),
+  text,
+});
 
-export const toggleTodo = (id) => {
-  return {
-    type: 'TOGGLE_TODO',
-    id,
-  };
-};
+export const toggleTodo = (id) => ({
+  type: 'TOGGLE_TODO',
+  id,
+});
 
-export const setVisibilityFilter = (filter) => {
-  return {
-    type: 'SET_VISIBILITY_FILTER',
-    filter,
-  };
-};
+export const setVisibilityFilter = (filter) => ({
+  type: 'SET_VISIBILITY_FILTER',
+  filter,
+});

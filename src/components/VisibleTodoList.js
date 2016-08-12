@@ -14,20 +14,17 @@ const getVisibleTodos = (todos, filter) => {
       throw new Error(`Unknown filter: ${filter}`);
   }
 };
-
-const mapStateToProps = (state) => {
-  return {
-    todos: getVisibleTodos(state.todos, state.visibilityFilter),
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    onTodoClick: (id) => {
-      dispatch(toggleTodo(id));
-    },
-  };
-};
+// remove duplicate blocks & replace w/()wrawpped obj expression
+const mapStateToProps = (state) => ({
+  todos: getVisibleTodos(state.todos, state.visibilityFilter),
+});
+// remove duplicate blocks & replace w/()wrawpped obj expression
+// when fxn is defined inside an object, dont need the arrow
+const mapDispatchToProps = (dispatch) => ({
+  onTodoClick(id) {
+    dispatch(toggleTodo(id));
+  },
+});
 
 const VisibleTodoList = connect(
   mapStateToProps,
