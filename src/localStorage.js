@@ -1,5 +1,5 @@
 // enable localstorage to load persistent state
-export const loadState() {
+export const loadState = () => {
   try {
     // get state form localStorage
     const serializedState = localStorage.getItem('state');

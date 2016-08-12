@@ -6,7 +6,7 @@ import { createStore } from 'redux'
 import reducers from './reducers'
 import App from './components/App';
 import { loadState, saveState } from './localStorage'; // localstorage state-persisting fxn
-import { throttle } from 'lodash/throttle'; // control timing & frequency of localstorage.state saving
+import throttle from 'lodash/throttle'; // control timing & frequency of localstorage.state saving
 
 // use LocalStorage browser API to handle persistent state
 const persistedState = loadState();
