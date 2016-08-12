@@ -1,4 +1,6 @@
 import { connect } from 'react-redux'
+// going to read params individually now
+import { withRouter } from 'react-router'; //withRouter inject reoute-relat4ed props (like params)
 import { toggleTodo } from '../actions'
 import TodoList from './TodoList'
 
@@ -16,12 +18,9 @@ const getVisibleTodos = (todos, filter) => {
   }
 };
 // remove duplicate blocks & replace w/()wrawpped obj expression
-const mapStateToProps = (state, ownProps) => ({
-  todos: getVisibleTodos(
-    state.todos,
-    // refactor to enable ReactRouter.Link params
-    ownProps.filter
-  ),
+// // read the filter prop from params
+const mapStateToProps = (state, { params }) => ({
+  todos: getVisibleTodos(state.todos, params.filter || 'all'),
 });
 // remove duplicate blocks & replace w/()wrawpped obj expression
 // when fxn is defined inside an object, dont need the arrow
@@ -31,9 +30,10 @@ const mapDispatchToProps = (dispatch) => ({
   },
 });
 
-const VisibleTodoList = connect(
+// withRouter will inject route params (filter prop) into VisibleTodoList
+const VisibleTodoList = withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
-)(TodoList);
+)(TodoList));
 
 export default VisibleTodoList;
