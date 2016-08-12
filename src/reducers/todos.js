@@ -36,3 +36,21 @@ const todos = (state = [], action) => {
 };
 
 export default todos;
+
+
+// add getVisibleTodos from VisibleTodoList component & make it a named export
+/* CONVETION: default export = reducer fxn; export with 'get' as prefix prepares data to be displayed by UI (a selector fxn that selects things from the UI)*/
+
+// getVisibleTodos will respond to the state of todos (as defined above)
+export const getVisibleTodos = (state, filter) => {
+  switch (filter) {
+    case 'all':
+      return todos;
+    case 'completed':
+      return todos.filter(t => t.completed);
+    case 'active':
+      return todos.filter(t => !t.completed);
+    default:
+      throw new Error(`Unknown filter: ${filter}`);
+  }
+};

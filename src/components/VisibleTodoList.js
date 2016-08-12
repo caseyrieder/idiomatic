@@ -3,22 +3,13 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'; //withRouter inject reoute-relat4ed props (like params)
 import { toggleTodo } from '../actions'
 import TodoList from './TodoList'
+// import getVisibleTodos from rootReducer
+import { getVisibleTodos } from '../reducers'
 
-const getVisibleTodos = (todos, filter) => {
-  switch (filter) {
-    case 'all':
-      return todos;
-    case 'completed':
-      return todos.filter(t => t.completed);
-    case 'active':
-      return todos.filter(t => !t.completed);
-    default:
-      throw new Error(`Unknown filter: ${filter}`);
-  }
-};
+// move getVisibleTodos into todos reducer
 
 const mapStateToProps = (state, { params }) => ({
-  todos: getVisibleTodos(state.todos, params.filter || 'all'),
+  todos: getVisibleTodos(state, params.filter || 'all'),
 });
 // // if ( prop(args) === action(args) )...simplify
 // const mapDispatchToProps = (dispatch) => ({
