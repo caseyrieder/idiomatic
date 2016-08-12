@@ -4,7 +4,6 @@ import { withRouter } from 'react-router'; //withRouter inject reoute-relat4ed p
 import { toggleTodo } from '../actions'
 import TodoList from './TodoList'
 
-// rename cases to match new definitions in Footer
 const getVisibleTodos = (todos, filter) => {
   switch (filter) {
     case 'all':
@@ -17,23 +16,22 @@ const getVisibleTodos = (todos, filter) => {
       throw new Error(`Unknown filter: ${filter}`);
   }
 };
-// remove duplicate blocks & replace w/()wrawpped obj expression
-// // read the filter prop from params
+
 const mapStateToProps = (state, { params }) => ({
   todos: getVisibleTodos(state.todos, params.filter || 'all'),
 });
-// remove duplicate blocks & replace w/()wrawpped obj expression
-// when fxn is defined inside an object, dont need the arrow
-const mapDispatchToProps = (dispatch) => ({
-  onTodoClick(id) {
-    dispatch(toggleTodo(id));
-  },
-});
+// // if ( prop(args) === action(args) )...simplify
+// const mapDispatchToProps = (dispatch) => ({
+//   onTodoClick(id) {
+//     dispatch(toggleTodo(id));
+//   },
+// });
 
 // withRouter will inject route params (filter prop) into VisibleTodoList
+// simplify mapDispatchToProps b/c args === args
 const VisibleTodoList = withRouter(connect(
   mapStateToProps,
-  mapDispatchToProps
+  { onTodoClick: toggleTodo }
 )(TodoList));
 
 export default VisibleTodoList;
