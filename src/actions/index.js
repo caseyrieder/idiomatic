@@ -1,9 +1,10 @@
-let nextTodo = 0;
+// replace nextTodoId with node-uuid so that each todo has a unique id & state refreshes dont reset the todo.id to "0"
+import { v4 } from 'node-uuid';
+// let nextTodo = 0;
 
-// remove duplicate blocks & replace with ()wrawpped object expression b/c it only returns a returnn statement
 export const addTodo = (text) => ({
   type: 'ADD_TODO',
-  id: (nextTodo++).toString(),
+  id: v4(),
   text,
 });
 
