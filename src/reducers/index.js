@@ -1,10 +1,11 @@
 import { combineReducers } from 'redux';
 import todos from './todos';
-import visibilityFilter from './visibilityFilter';
+// delete because we dont need it, since its handled by the router with paths
+// import visibilityFilter from './visibilityFilter';
 
 const reducers = combineReducers({
   todos,
-  visibilityFilter,
+  // visibilityFilter,
 });
 
 export default reducers;
