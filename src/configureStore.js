@@ -3,6 +3,24 @@ import reducers from './reducers'
 import { loadState, saveState } from './localStorage'; // localstorage state-persisting fxn
 import throttle from 'lodash/throttle'; // control timing & frequency of localstorage.state saving
 
+// wrap dispatch to log the action
+const addLoggingToDispatch = (store) => {
+  const rawDispatch = store.dispatch;
+  if (!console.group) {
+    return rawDispatch;
+  }
+
+  return (action) => {
+    console.group(action.type);
+    console.log('%c prev state', 'color: gray', store.getState());
+    console.log('%c action', 'color: blue', action);
+    const returnValue = rawDispatch(action);
+    console.log('%c next state', 'color: green', store.getState());
+    console.groupEnd(action.type);
+    return returnValue;
+  }
+}
+
 const configureStore = () => {
   // use LocalStorage browser API to handle persistent state
   const persistedState = loadState();
@@ -11,6 +29,11 @@ const configureStore = () => {
     reducers,
     persistedState
   );
+
+  // add some console.logs to the dispatch (only in dev)
+  if (process.env.NODE_ENV !== 'production') {
+    store.dispatch = addLoggingToDispatch(store);
+  }
   // save state to localStorage.state whenever store changes
   // but lets just save the data, not the UI (todos, not filter)
   // // user throttle to control frequency of state-saving
