@@ -1,7 +1,8 @@
 import { createStore } from 'redux'
 import reducers from './reducers'
-import { loadState, saveState } from './localStorage'; // localstorage state-persisting fxn
-import throttle from 'lodash/throttle'; // control timing & frequency of localstorage.state saving
+/*REMOVE LOCALSTORAGE & PERSISTENCE STUFF*/
+// import { loadState, saveState } from './localStorage'; // localstorage state-persisting fxn
+// import throttle from 'lodash/throttle'; // control timing & frequency of localstorage.state saving
 
 // wrap dispatch to log the action
 const addLoggingToDispatch = (store) => {
@@ -22,26 +23,26 @@ const addLoggingToDispatch = (store) => {
 }
 
 const configureStore = () => {
+/*REMOVE LOCALSTORAGE & PERSISTENCE STUFF*/
   // use LocalStorage browser API to handle persistent state
-  const persistedState = loadState();
-  // create Store with persisted state
-  const store = createStore(
-    reducers,
-    persistedState
-  );
+  // const persistedState = loadState();
+
+  // create Store
+  const store = createStore(reducers);
 
   // add some console.logs to the dispatch (only in dev)
   if (process.env.NODE_ENV !== 'production') {
     store.dispatch = addLoggingToDispatch(store);
   }
+/*REMOVE LOCALSTORAGE & PERSISTENCE STUFF*/
   // save state to localStorage.state whenever store changes
   // but lets just save the data, not the UI (todos, not filter)
   // // user throttle to control frequency of state-saving
-  store.subscribe(throttle(() => {
-    saveState({
-      todos: store.getState().todos,
-    });
-  }, 1000));
+  // store.subscribe(throttle(() => {
+  //   saveState({
+  //     todos: store.getState().todos,
+  //   });
+  // }, 1000));
 
   return store;
 };
