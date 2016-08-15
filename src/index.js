@@ -6,6 +6,7 @@ import configureStore from './configureStore'; // refactored
 import { fetchTodos } from './api'; // import the fake backend
 
 // use fake backend to seed & log data
+// // this should ensure that the fetchTodos promise resolves to an array of todos
 fetchTodos('all').then(todos =>
 	console.log(todos)
 );

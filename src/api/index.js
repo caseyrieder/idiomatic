@@ -17,9 +17,11 @@ const fakeDatabase = {
 	}],
 };
 
+// manual delay to mimic actual REST calls
 const delay = (ms) =>
 	new Promise(resolve => setTimeout(resolve, ms));
 
+// methods to fake real REST calls & Promise returns
 export const fetchTodos = (filter) =>
 	delay(500).then(() => {
 		switch (filter) {
