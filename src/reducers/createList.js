@@ -11,14 +11,16 @@ const createList = (filter) => {
         // move filter checker into FETCH_TODOS_SUCCESS
       case 'FETCH_TODOS_SUCCESS':
         return filter === action.filter ?
-          action.response.map(todo => todo.id) :
+          // change this because the response is ALREADY an array of ids
+          action.response.result :
           state;
       // handle re-run after a successful addTodo
       // since this has no filter property, the top-level filter checker will fail
       // make the new todo show up in every non-completed filter (by default, they are incomplete)
       case 'ADD_TODO_SUCCESS':
         return filter !== 'completed' ?
-          [...state, action.response.id] :
+          // change this b/c the response is already a single id
+          [...state, action.response.result] :
           state;
       default:
         return state;

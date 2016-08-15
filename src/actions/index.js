@@ -5,6 +5,10 @@
 import * as api from '../api';
 // import getIsFetching reducer to enable action chaining
 import { getIsFetching } from '../reducers';
+// import normalizer
+import { normalize } from 'normalizr';
+// import namespaced const fro all schema in schema file
+import * as schema from './schema';
 // requestTodos action to make a new API call
 // dont export it anymore b/c we chain it to fetchTodos via thunk
 // Now, embed the requestTodos object into the fetchTodos action
@@ -43,10 +47,11 @@ export const fetchTodos = (filter) => (dispatch, getState) => {
   // rename 'RECEIVE_TODOS' as 'FETCH_TODOS_SUCCESS'
   return api.fetchTodos(filter).then(
     response => {
+      // add normalized logging callback for display todos list
       dispatch({
         type: 'FETCH_TODOS_SUCCESS',
         filter,
-        response,
+        response: normalize(response, schema.arrayOfTodos),
       });
     },
     // handle error
@@ -66,9 +71,10 @@ export const fetchTodos = (filter) => (dispatch, getState) => {
 // newly added todo will be part of server response...so change the byId reducer accordingly
 export const addTodo = (text) => (dispatch) =>
   api.addTodo(text).then(response => {
+    // add normalized logging callback for display new todo
     dispatch({
       type: 'ADD_TODO_SUCCESS',
-      response,
+      response: normalize(response, schema.todo),
     });
   });
 
