@@ -7,8 +7,6 @@ import * as actions from '../actions';
 import TodoList from './TodoList';
 // import getVisibleTodos from rootReducer
 import { getVisibleTodos } from '../reducers';
-// fetch todos from api here
-import { fetchTodos } from '../api';
 /* currently, fetchTodos is inside the componentDidMount lifecycle group (takes place after mounting). BUT, since we can't override the lifecycle fxns form generated components (i.e., TodoList) we need to create a new React Component to handle the fetchTodos call ---> */
 import React, { Component } from 'react';
 
@@ -30,11 +28,10 @@ class VisibleTodoList extends Component {
   // combine common componentDidMount/Update code
   /* we want fetchTodos to become part of redux store state, and the ONLY way to get something into the state is to dispatch an action */
     // this will pass the filter through the action creator (these props are available via mapState & mapDispatch...)
+  // simplify, now that fetchTodos is defined in '/actions/index'
   fetchData() {
-    const { filter, receiveTodos } = this.props;
-    fetchTodos(filter).then(todos =>
-      receiveTodos(filter, todos)
-    );
+    const { filter, fetchTodos } = this.props;
+    fetchTodos(filter);
   }
   // define render method to render TodoList, as before
 

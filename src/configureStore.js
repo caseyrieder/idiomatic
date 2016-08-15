@@ -22,6 +22,21 @@ const addLoggingToDispatch = (store) => {
   }
 }
 
+// add Promise support (takes store & returns version of dispatch that will accept promises)
+const addPromiseSupportToDispatch = (store) => {
+  // defines existing store, so that we can call ot later
+  const rawDispatch = store.dispatch;
+  // return fxn with same API as dipatch: takes an action
+  return (action) => {
+    // if action is a promise (has .then method) as opposed to a 'real' ation (returns an object)...return the then-rawDispatch once that promise resolves
+    if (typeof action.then === 'function') {
+      return action.then(rawDispatch);
+    }
+    // otherwise, cal lrawDispatch right away
+    return rawDispatch(action);
+  };
+};
+
 const configureStore = () => {
 /*REMOVE LOCALSTORAGE & PERSISTENCE STUFF*/
   // use LocalStorage browser API to handle persistent state
@@ -34,6 +49,9 @@ const configureStore = () => {
   if (process.env.NODE_ENV !== 'production') {
     store.dispatch = addLoggingToDispatch(store);
   }
+
+  // use PromiseSupport to wrap dispatch (this enabling it to accept promises)
+  store.dispatch = addPromiseSupportToDispatch(store);
 /*REMOVE LOCALSTORAGE & PERSISTENCE STUFF*/
   // save state to localStorage.state whenever store changes
   // but lets just save the data, not the UI (todos, not filter)
