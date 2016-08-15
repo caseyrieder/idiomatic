@@ -5,14 +5,21 @@ import { combineReducers } from 'redux';
 const createList = (filter) => {
   // rename this to ensure that THIS reducer only deals with state.ids, not the entire state (which now includes an isFetching boolean)
   const ids = (state = [], action) => {
-    if (action.filter !== filter) {
-      return state;
-    }
     // return odo ids from receiveTodos actioncreator, based on the filter that is passed to createList
     // rename RECEIVE_TODOS to FETCH_TODOS_SUCCESS
     switch (action.type) {
+        // move filter checker into FETCH_TODOS_SUCCESS
       case 'FETCH_TODOS_SUCCESS':
-        return action.response.map(todo => todo.id);
+        return filter === action.filter ?
+          action.response.map(todo => todo.id) :
+          state;
+      // handle re-run after a successful addTodo
+      // since this has no filter property, the top-level filter checker will fail
+      // make the new todo show up in every non-completed filter (by default, they are incomplete)
+      case 'ADD_TODO_SUCCESS':
+        return filter !== 'completed' ?
+          [...state, action.response.id] :
+          state;
       default:
         return state;
     }

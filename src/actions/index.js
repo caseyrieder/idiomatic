@@ -1,5 +1,6 @@
 // replace nextTodoId with node-uuid so that each todo has a unique id & state refreshes dont reset the todo.id to "0"
-import { v4 } from 'node-uuid';
+//since id generation now happens on the server, no longer need v4 here
+//import { v4 } from 'node-uuid';
 // make all api fxns available to action creators
 import * as api from '../api';
 // import getIsFetching reducer to enable action chaining
@@ -60,15 +61,21 @@ export const fetchTodos = (filter) => (dispatch, getState) => {
 };
 //^ that will require a thunk (chaining callbacks after promises)
 
-export const addTodo = (text) => ({
-  type: 'ADD_TODO',
-  id: v4(),
-  text,
-});
+/* modify addTodo & toggleTodo with API calls */
+// make them thunk action creators
+// newly added todo will be part of server response...so change the byId reducer accordingly
+export const addTodo = (text) => (dispatch) =>
+  api.addTodo(text).then(response => {
+    dispatch({
+      type: 'ADD_TODO_SUCCESS',
+      response,
+    });
+  });
 
 export const toggleTodo = (id) => ({
   type: 'TOGGLE_TODO',
   id,
 });
+
 
 // no long need setVisibilityFilter action creator, because reactRouter.Link (in FilterLink) will handle it

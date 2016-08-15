@@ -13,6 +13,13 @@ const byId = (state = {}, action) => {
         nextState[todo.id] = todo;
       });
       return nextState;
+    // if we have a successful addTodo, append the todo to the lookup table in state
+    // But this doesnt update the listByFilter...yet
+    case 'ADD_TODO_SUCCESS':
+      return {
+        ...state,
+        [action.response.id]: action.response,
+      }
     default:
       return state;
   }
