@@ -12,16 +12,23 @@ const receiveTodos = (filter, response) => ({
 });
 
 // requestTodos action to make a new API call
-export const requestTodos = (filter) => ({
+// dont export it anymore b/c we chain it to fetchTodos via thunk
+const requestTodos = (filter) => ({
   type: 'REQUEST_TODOS',
   filter,
 });
 
 // add async ation creator is an api call that resolves to the receiveTodos aciton crteator, which THEN resolves to an action object
-export const fetchTodos = (filter) =>
-  api.fetchTodos(filter).then(response =>
-    receiveTodos(filter, response)
-  );
+// NOW, reather than returning promise, return a fxn that accepts a dispatch callback argument...this lets me call back dispatch anytime I want during the async operation
+export const fetchTodos = (filter) => (dispatch) => {
+  // dispatch the requestTodos aciton in the beginning...
+  dispatch(requestTodos(filter));
+  // ...when promise resolves, explicitly dispatch another receiveTodos action at the end
+  return api.fetchTodos(filter).then(response => {
+    dispatch(receiveTodos(filter, response));
+  });
+};
+//^ that will require a thunk (chaining callbacks after promises)
 
 export const addTodo = (text) => ({
   type: 'ADD_TODO',

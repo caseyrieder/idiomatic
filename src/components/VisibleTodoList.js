@@ -31,9 +31,10 @@ class VisibleTodoList extends Component {
   // simplify, now that fetchTodos is defined in '/actions/index'
   fetchData() {
     // add requestTodos action as a prop
-    const { filter, requestTodos, fetchTodos } = this.props;
+    const { filter, fetchTodos } = this.props;
     // call requestTodos before start the asyn operation with request todos
-    requestTodos(filter);
+    // requestTodos(filter);
+    // // BUT!!, we never wanna fire requestTodos & fetchTodos separately, so how to we chain them?...THUNKS!
     fetchTodos(filter);
   }
   // define render method to render TodoList, as before

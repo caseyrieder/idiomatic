@@ -1,7 +1,8 @@
 // add middleware handler
 import { createStore, applyMiddleware } from 'redux';
 import createLogger from 'redux-logger';
-import promise from 'redux-promise';
+// use thunk instead of promises (will let us chain callbacks to promises)
+// import promise from 'redux-promise';
 import reducers from './reducers';
 /*REMOVE LOCALSTORAGE & PERSISTENCE STUFF*/
 // import { loadState, saveState } from './localStorage'; // localstorage state-persisting fxn
@@ -51,6 +52,14 @@ import reducers from './reducers';
 //   );
 // };
 
+// write our thunk middleware: takes the store, next MW, & ation as current args...
+// ...BUT, if the action is a fxn, rather than an action (fxn vs object) we wanna inject the dispatch fxn into the action--> thus allowing this action to dispatch other actions itself
+// //this is needed for the fetchTodos action
+const thunk = (store) => (next) => (action) =>
+  typeof action === 'function' ?
+    action(store.dispatch) :
+    next(action);
+
 const configureStore = () => {
 /*REMOVE LOCALSTORAGE & PERSISTENCE STUFF*/
   // use LocalStorage browser API to handle persistent state
@@ -58,7 +67,8 @@ const configureStore = () => {
 
   // reather than overriding public api for dispatch, we add middleware array to append functions to dispatch
   // // initialize with 'promise' to ensure that it is the first MW through which the action propagates
-  const middlewares = [promise];
+  // change promise to thunk
+  const middlewares = [thunk];
   // add some console.logs to the dispatch (only in dev)
   if (process.env.NODE_ENV !== 'production') {
     middlewares.push(createLogger());
