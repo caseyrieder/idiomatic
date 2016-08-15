@@ -4,11 +4,13 @@ import reducers from './reducers'
 // import { loadState, saveState } from './localStorage'; // localstorage state-persisting fxn
 // import throttle from 'lodash/throttle'; // control timing & frequency of localstorage.state saving
 
-// wrap dispatch to log the action
-const addLoggingToDispatch = (store) => {
-  const rawDispatch = store.dispatch;
+// wrap dispatch (next) to log the action
+// // rename
+// rewrite this line to enable middleware-wrapping---middleare becomes a fxn (addLogging...), that returns a fxn (next), that returns a fxn (action)
+// const next = store.dispatch;
+const logger = (store) => (next) =>
   if (!console.group) {
-    return rawDispatch;
+    return next;
   }
 
   return (action) => {
@@ -19,22 +21,28 @@ const addLoggingToDispatch = (store) => {
     console.log('%c next state', 'color: green', store.getState());
     console.groupEnd(action.type);
     return returnValue;
-  }
-}
+  };
+};
 
 // add Promise support (takes store & returns version of dispatch that will accept promises)
-const addPromiseSupportToDispatch = (store) => {
-  // defines existing store, so that we can call ot later
-  const rawDispatch = store.dispatch;
-  // return fxn with same API as dipatch: takes an action
-  return (action) => {
-    // if action is a promise (has .then method) as opposed to a 'real' ation (returns an object)...return the then-rawDispatch once that promise resolves
-    if (typeof action.then === 'function') {
-      return action.then(rawDispatch);
-    }
-    // otherwise, cal lrawDispatch right away
-    return rawDispatch(action);
-  };
+// rewrite to enable middleware-wrapping
+// // // rename
+// since arrow fxns can have expressions as their bodies (so: => {return (next) =>...} becomes => (next) => ), lets clean this up:
+const promise = (store) => (next) => (action) => {
+  // if action is a promise (has .then method) as opposed to a 'real' ation (returns an object)...return the then-rawDispatch (next) once that promise resolves
+  if (typeof action.then === 'function') {
+    return action.then(next);
+  }
+  // otherwise, call rawDispatch(next) right away
+  return next(action);
+};
+
+// create middleare-wrapping function to wrap store, as well as the next middleware later
+// // add slice.reverse to handle the order of middleware propagation
+const wrapDispatchWithMiddlewares = (store, middlewares) => {
+  middlewares.slice().reverse().forEach(middleware =>
+    store.dispatch = middleware(store)(store.dispatch)
+  );
 };
 
 const configureStore = () => {
@@ -45,22 +53,17 @@ const configureStore = () => {
   // create Store
   const store = createStore(reducers);
 
+  // reather than overriding public api for dispatch, we add middleware array to append functions to dispatch
+  // // initialize with 'promise' to ensure that it is the first MW through which the action propagates
+  const middlewares = [promise];
   // add some console.logs to the dispatch (only in dev)
   if (process.env.NODE_ENV !== 'production') {
-    store.dispatch = addLoggingToDispatch(store);
+    middlewares.push(logger);
   }
 
-  // use PromiseSupport to wrap dispatch (this enabling it to accept promises)
-  store.dispatch = addPromiseSupportToDispatch(store);
-/*REMOVE LOCALSTORAGE & PERSISTENCE STUFF*/
-  // save state to localStorage.state whenever store changes
-  // but lets just save the data, not the UI (todos, not filter)
-  // // user throttle to control frequency of state-saving
-  // store.subscribe(throttle(() => {
-  //   saveState({
-  //     todos: store.getState().todos,
-  //   });
-  // }, 1000));
+
+  // add middlewares array to store
+  wrapDispatchWithMiddlewares(store, middlewares);
 
   return store;
 };
