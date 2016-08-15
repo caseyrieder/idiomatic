@@ -67,7 +67,8 @@ const configureStore = () => {
   // create Store after specifying the middleware
   return createStore(
     reducers,
-    applyMiddleware(...middlewares)
+    // if we wanna apply persisted state, do it here...before "enhancer"
+    applyMiddleware(...middlewares) // this final arg to createStore is the "enhancer"
   );
 };
 
