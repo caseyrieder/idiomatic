@@ -11,6 +11,12 @@ const receiveTodos = (filter, response) => ({
   response,
 });
 
+// requestTodos action to make a new API call
+export const requestTodos = (filter) => ({
+  type: 'REQUEST_TODOS',
+  filter,
+});
+
 // add async ation creator is an api call that resolves to the receiveTodos aciton crteator, which THEN resolves to an action object
 export const fetchTodos = (filter) =>
   api.fetchTodos(filter).then(response =>

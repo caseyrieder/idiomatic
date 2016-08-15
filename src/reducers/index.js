@@ -4,7 +4,7 @@ import { combineReducers } from 'redux';
 // import todo from './todo';
 // EXTRACT byId reducer into separate file, then import it, along with the getTodo named selector
 import byId, * as fromById from './byId';
-// import createList fxn to generate todo ids list
+// import createList fxn to generate todo ids list, plus named exports
 import createList, * as fromList from './createList';
 // rename todos => allIds
 // will also call the 'todo' reducer file to figure out how to respond
@@ -107,3 +107,8 @@ export const getVisibleTodos = (state, filter) => {
   return ids.map(id => fromById.getTodo(state.byId, id));
   // ^ lets us change the state shape of any reducer in the future, without having to change the whole code base
 };
+
+// add boolean export to determine if we are fetching data or not (to display 'loading...' message)
+// pass the state of the list, which we get by 'state.listByFilter' ==. all/active/completed
+export const getIsFetching = (state, filter) =>
+  fromList.getIsFetching(state.listByFilter[filter]);

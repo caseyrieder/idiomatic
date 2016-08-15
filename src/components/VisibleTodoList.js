@@ -5,8 +5,8 @@ import { withRouter } from 'react-router'; //withRouter inject reoute-relat4ed p
 // // reduce boilerplate
 import * as actions from '../actions';
 import TodoList from './TodoList';
-// import getVisibleTodos from rootReducer
-import { getVisibleTodos } from '../reducers';
+// import getVisibleTodos & getIsFetching from rootReducer
+import { getVisibleTodos, getIsFetching } from '../reducers';
 /* currently, fetchTodos is inside the componentDidMount lifecycle group (takes place after mounting). BUT, since we can't override the lifecycle fxns form generated components (i.e., TodoList) we need to create a new React Component to handle the fetchTodos call ---> */
 import React, { Component } from 'react';
 
@@ -30,18 +30,26 @@ class VisibleTodoList extends Component {
     // this will pass the filter through the action creator (these props are available via mapState & mapDispatch...)
   // simplify, now that fetchTodos is defined in '/actions/index'
   fetchData() {
-    const { filter, fetchTodos } = this.props;
+    // add requestTodos action as a prop
+    const { filter, requestTodos, fetchTodos } = this.props;
+    // call requestTodos before start the asyn operation with request todos
+    requestTodos(filter);
     fetchTodos(filter);
   }
   // define render method to render TodoList, as before
 
   render() {
-    // destructure props b/c toggleTodo needs to be passed by onTodoClick callback prop name, but the rest can be as they are
-    const { toggleTodo, ...rest } = this.props;
+    // destructure props b/c toggleTodo needs to be passed by onTodoClick callback prop name
+    // also need a list of todos & value of isFetching bool
+    const { toggleTodo, todos, isFetching } = this.props;
+    // show the user that a fetch is occurring
+    if (isFetching && !todos.length) {
+      return <p>Loading...</p>;
+    }
     // pass toggleTodo as action for onTodoClick prop, but the other props as themselves
     return (
       <TodoList
-        {...rest}
+        todos={todos}
         onTodoClick={toggleTodo}
       />
     );
@@ -50,10 +58,12 @@ class VisibleTodoList extends Component {
 
 // make current filter available as a prop (for componentDidMount...fetchTodos)--
 // calculate filter from params & pass both filter & todos into props as part of the state object
+// add isFetching here
 const mapStateToProps = (state, { params }) => {
   const filter = params.filter || 'all';
   return {
     todos: getVisibleTodos(state, filter),
+    isFetching: getIsFetching(state, filter),
     filter,
   };
 };
