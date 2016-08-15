@@ -8,7 +8,7 @@ import { combineReducers } from 'redux';
 const byId = (state = {}, action) => {
   switch (action.type) {
     case 'RECEIVE_TODOS':
-      // create shadow copy of state object (which corresponds to the lookup table)
+      // create shallow copy of state object (which corresponds to the lookup table)
       const nextState = { ...state };
       // for every todo in the response, take it & put it into the next version of the lookup table
       // replace that todo id with the new todo id we just fetched
