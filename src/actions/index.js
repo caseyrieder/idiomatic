@@ -78,10 +78,14 @@ export const addTodo = (text) => (dispatch) =>
     });
   });
 
-export const toggleTodo = (id) => ({
-  type: 'TOGGLE_TODO',
-  id,
-});
+// make toggleTodo a thunk actionCreator as well
+export const toggleTodo = (id) => (dispatch) =>
+  api.toggleTodo(id).then(response => {
+    dispatch({
+      type: 'TOGGLE_TODO_SUCCESS',
+      response: normalize(response, schema.todo),
+    });
+  });
 
 
 // no long need setVisibilityFilter action creator, because reactRouter.Link (in FilterLink) will handle it

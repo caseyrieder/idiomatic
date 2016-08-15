@@ -4,6 +4,23 @@ import { combineReducers } from 'redux';
 // -->this returns a reducer (state shape is an array of todo ids, based on the filter)
 const createList = (filter) => {
   // rename this to ensure that THIS reducer only deals with state.ids, not the entire state (which now includes an isFetching boolean)
+
+  // declare handleToggle fxn to handle TOGGLE_TODO_SUCCESS
+  const handleToggle = (state, action) => {
+    //destructure result for response as the id of the toggled todo, & the entities from within the response
+    const { result: toggledId, entities } = action.response;
+    // read completed value from toggled todo
+    const { completed } = entities.todos[toggledId];
+    // do i wanna remove the todo from the list?
+    const shouldRemove = (
+      (completed && filter === 'active') ||
+      (!completed && filter === 'completed')
+    );
+    // if shouldRemove is true, return list without the toggled id, otherwise, return everything
+    return shouldRemove ?
+      state.filter(id => id !== toggledId) :
+      state;
+  };
   const ids = (state = [], action) => {
     // return odo ids from receiveTodos actioncreator, based on the filter that is passed to createList
     // rename RECEIVE_TODOS to FETCH_TODOS_SUCCESS
@@ -22,6 +39,9 @@ const createList = (filter) => {
           // change this b/c the response is already a single id
           [...state, action.response.result] :
           state;
+      // imlpement immediate updating of completed v not completed todos on TOGGLE... action--via handleToggle fxn
+      case 'TOGGLE_TODO_SUCCESS':
+        return handleToggle(state, action);
       default:
         return state;
     }
