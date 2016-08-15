@@ -6,19 +6,20 @@ import * as api from '../api';
 import { getIsFetching } from '../reducers';
 // requestTodos action to make a new API call
 // dont export it anymore b/c we chain it to fetchTodos via thunk
-const requestTodos = (filter) => ({
-  type: 'REQUEST_TODOS',
-  filter,
-});
+// Now, embed the requestTodos object into the fetchTodos action
+// const requestTodos = (filter) => ({
+//   type: 'REQUEST_TODOS',
+//   filter,
+// });
 
 // add receiveTodos that will pull todos from api to be displayed in VisibleTodoList (or wherever)
 // accepts server response & filter as args & returns an object of type: RECEIVE_TODOS, filter & response
 // remove 'export' because components will now use fetchTodos to run this code block
-const receiveTodos = (filter, response) => ({
-  type: 'RECEIVE_TODOS',
-  filter,
-  response,
-});
+// const receiveTodos = (filter, response) => ({
+//   type: 'RECEIVE_TODOS',
+//   filter,
+//   response,
+// });
 
 
 // add async ation creator is an api call that resolves to the receiveTodos aciton crteator, which THEN resolves to an action object
@@ -30,11 +31,32 @@ export const fetchTodos = (filter) => (dispatch, getState) => {
     return Promise.resolve();
   }
   // dispatch the requestTodos aciton in the beginning...
-  dispatch(requestTodos(filter));
-  // ...when promise resolves, explicitly dispatch another receiveTodos action at the end
-  return api.fetchTodos(filter).then(response => {
-    dispatch(receiveTodos(filter, response));
+  // ...by embedding the requestTodos object here
+  // rename 'REQUEST_TODOS' as 'FETCH_TODOS_REQUEST'
+  dispatch({
+    type: 'FETCH_TODOS_REQUEST',
+    filter,
   });
+  // ...when promise resolves, explicitly dispatch another receiveTodos action at the end...
+  // ...& embed the receiveTodos action here
+  // rename 'RECEIVE_TODOS' as 'FETCH_TODOS_SUCCESS'
+  return api.fetchTodos(filter).then(
+    response => {
+      dispatch({
+        type: 'FETCH_TODOS_SUCCESS',
+        filter,
+        response,
+      });
+    },
+    // handle error
+    error => {
+      dispatch({
+        type: 'FETCH_TODOS_FAILURE',
+        filter,
+        message: error.message || 'Something went wrong',
+      })
+    }
+  );
 };
 //^ that will require a thunk (chaining callbacks after promises)
 

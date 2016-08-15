@@ -9,8 +9,9 @@ const createList = (filter) => {
       return state;
     }
     // return odo ids from receiveTodos actioncreator, based on the filter that is passed to createList
+    // rename RECEIVE_TODOS to FETCH_TODOS_SUCCESS
     switch (action.type) {
-      case 'RECEIVE_TODOS':
+      case 'FETCH_TODOS_SUCCESS':
         return action.response.map(todo => todo.id);
       default:
         return state;
@@ -18,15 +19,34 @@ const createList = (filter) => {
   };
 
   // add isFetching reducer to handle getIsFetching boolean, based on REQUEST_TODOS actioncreator
+  // rename RECEIVE_TODOS to FETCH_TODOS_SUCCESS, REQUEST_TODOS to FETCH_TODOS_REQUEST
+  // add error handler
   const isFetching = (state = false, action) => {
     if (action.filter !== filter) {
       return state;
     }
     switch (action.type) {
-      case 'REQUEST_TODOS':
+      case 'FETCH_TODOS_REQUEST':
         return true;
-      case 'RECEIVE_TODOS':
+      case 'FETCH_TODOS_SUCCESS':
+      case 'FETCH_TODOS_FAILURE':
         return false;
+      default:
+        return state;
+    }
+  };
+
+  // handle errors with this reducer--return the action-creator's message if error happens
+  const errorMessage = (state = null, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+    switch (action.type) {
+      case 'FETCH_TODOS_REQUEST':
+      case 'FETCH_TODOS_SUCCESS':
+        return null;
+      case 'FETCH_TODOS_FAILURE':
+        return action.message;
       default:
         return state;
     }
@@ -35,6 +55,7 @@ const createList = (filter) => {
   return combineReducers({
     ids,
     isFetching,
+    errorMessage,
   });
 };
 
@@ -44,3 +65,5 @@ export default createList;
 export const getIds = (state) => state.ids;
 // add boolean to determine if we are currently fetching data...this boolean is part of the state object
 export const getIsFetching = (state) => state.isFetching;
+// add error message exporter
+export const getErrorMessage = (state) => state.errorMessage;

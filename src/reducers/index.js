@@ -112,3 +112,7 @@ export const getVisibleTodos = (state, filter) => {
 // pass the state of the list, which we get by 'state.listByFilter' ==. all/active/completed
 export const getIsFetching = (state, filter) =>
   fromList.getIsFetching(state.listByFilter[filter]);
+
+// handle errors
+export const getErrorMessage = (state, filter) =>
+  fromList.getErrorMessage(state.listByFilter[filter]);

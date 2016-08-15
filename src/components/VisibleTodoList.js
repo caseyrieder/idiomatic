@@ -5,11 +5,12 @@ import { withRouter } from 'react-router'; //withRouter inject reoute-relat4ed p
 // // reduce boilerplate
 import * as actions from '../actions';
 import TodoList from './TodoList';
-// import getVisibleTodos & getIsFetching from rootReducer
-import { getVisibleTodos, getIsFetching } from '../reducers';
+// import getVisibleTodos & getIsFetching & getErrorMessage from rootReducer
+import { getVisibleTodos, getIsFetching, getErrorMessage } from '../reducers';
 /* currently, fetchTodos is inside the componentDidMount lifecycle group (takes place after mounting). BUT, since we can't override the lifecycle fxns form generated components (i.e., TodoList) we need to create a new React Component to handle the fetchTodos call ---> */
-import React, { Component } from 'react';
-
+import React, { Component, PropTypes } from 'react';
+// import FetchERror to display error message & re-run fetch
+import FetchError from './FetchError';
 // so, define the VisibleTodoList component
 // THE ONLY PURPOSE FOR ADDING THIS COMPONENT IS TO ADD THE LIFECYCLE GROUPS
 class VisibleTodoList extends Component {
@@ -42,10 +43,20 @@ class VisibleTodoList extends Component {
   render() {
     // destructure props b/c toggleTodo needs to be passed by onTodoClick callback prop name
     // also need a list of todos & value of isFetching bool
-    const { toggleTodo, todos, isFetching } = this.props;
+    // add errorMessage
+    const { toggleTodo, errorMessage, todos, isFetching } = this.props;
     // show the user that a fetch is occurring
     if (isFetching && !todos.length) {
       return <p>Loading...</p>;
+    }
+    // display message if errorMessage & re-run fetch
+    if (errorMessage && !todos.length) {
+      return (
+        <FetchError
+          message={errorMessage}
+          onRetry={() => this.fetchData()}
+        />
+      );
     }
     // pass toggleTodo as action for onTodoClick prop, but the other props as themselves
     return (
@@ -57,14 +68,25 @@ class VisibleTodoList extends Component {
   }
 }
 
+// add required proptype
+VisibleTodoList.propTypes = {
+  filter: PropTypes.oneOf(['all', 'active', 'completed']).isRequired,
+  errorMessgae: PropTypes.string,
+  todos: PropTypes.array.isRequired,
+  isFetching: PropTypes.bool.isRequired,
+  toggleTodo: PropTypes.func.isRequired,
+  fetchTodos: PropTypes.func.isRequired,
+};
+
 // make current filter available as a prop (for componentDidMount...fetchTodos)--
 // calculate filter from params & pass both filter & todos into props as part of the state object
-// add isFetching here
+// add isFetching & errorMessage here
 const mapStateToProps = (state, { params }) => {
   const filter = params.filter || 'all';
   return {
     todos: getVisibleTodos(state, filter),
     isFetching: getIsFetching(state, filter),
+    errorMessage: getErrorMessage(state, filter),
     filter,
   };
 };
